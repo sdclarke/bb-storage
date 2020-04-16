@@ -3,6 +3,10 @@ load("@io_bazel_rules_go//go:def.bzl", "go_library", "go_test")
 go_library(
     name = "digest",
     srcs = [
+        "blake3zcc_blob_hasher.go",
+        "blake3zcc_manifest.go",
+        "blake3zcc_manifest_hasher.go",
+        "blake3zcc_manifest_parser.go",
         "configuration.go",
         "digest.go",
         "existence_cache.go",
@@ -10,6 +14,7 @@ go_library(
         "instance_name.go",
         "instance_name_patcher.go",
         "instance_name_trie.go",
+        "manifest_parser.go",
         "set.go",
         "set_builder.go",
     ],
@@ -21,6 +26,7 @@ go_library(
         "//pkg/proto/configuration/digest",
         "//pkg/util",
         "@com_github_bazelbuild_remote_apis//build/bazel/remote/execution/v2:execution",
+        "//pkg/digest/blake3zcc:go_default_library",
         "@com_github_golang_protobuf//ptypes:go_default_library_gen",
         "@com_github_google_uuid//:uuid",
         "@org_golang_google_grpc//codes",
@@ -31,6 +37,7 @@ go_library(
 go_test(
     name = "digest_test",
     srcs = [
+        "blake3zcc_manifest_parser_test.go",
         "digest_test.go",
         "existence_cache_test.go",
         "instance_name_patcher_test.go",

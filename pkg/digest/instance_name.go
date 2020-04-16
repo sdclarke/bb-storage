@@ -94,6 +94,46 @@ func MustNewInstanceName(value string) InstanceName {
 // object size. The object returned by this function is guaranteed to be
 // non-degenerate.
 func (in InstanceName) NewDigest(hash string, sizeBytes int64) (Digest, error) {
+	if strings.HasPrefix(hash, "B3Z:") {
+		return in.newDigestBLAKE3ZCC(hash[4:], sizeBytes)
+	}
+	if strings.HasPrefix(hash, "B3ZM:") {
+		return in.newDigestBLAKE3ZCCManifest(hash[5:], sizeBytes)
+	}
+	return in.newDigestOther(hash, sizeBytes)
+}
+
+func (in InstanceName) newDigestBLAKE3ZCC(hash string, sizeBytes int64) (Digest, error) {
+	// TODO(edsch): Validate the instance name. Maybe have a
+	// restrictive character set? What about length?
+
+	// Validate the size.
+	if sizeBytes < 0 {
+		return BadDigest, status.Errorf(codes.InvalidArgument, "Invalid digest size: %d bytes", sizeBytes)
+	}
+
+	// TODO: Validate hash!
+	return Digest{
+		value: fmt.Sprintf("B3Z:%s-%d-%s", hash, sizeBytes, in.value),
+	}, nil
+}
+
+func (in InstanceName) newDigestBLAKE3ZCCManifest(hash string, sizeBytes int64) (Digest, error) {
+	// TODO(edsch): Validate the instance name. Maybe have a
+	// restrictive character set? What about length?
+
+	// Validate the size.
+	if sizeBytes < 0 {
+		return BadDigest, status.Errorf(codes.InvalidArgument, "Invalid digest size: %d bytes", sizeBytes)
+	}
+
+	// TODO: Validate hash!
+	return Digest{
+		value: fmt.Sprintf("B3ZM:%s-%d-%s", hash, sizeBytes, in.value),
+	}, nil
+}
+
+func (in InstanceName) newDigestOther(hash string, sizeBytes int64) (Digest, error) {
 	// Validate the hash.
 	if l := len(hash); l != md5.Size*2 && l != sha1.Size*2 &&
 		l != sha256.Size*2 && l != sha512.Size384*2 && l != sha512.Size*2 {

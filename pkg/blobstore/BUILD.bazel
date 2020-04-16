@@ -8,6 +8,7 @@ go_library(
         "cas_read_buffer_factory.go",
         "demultiplexing_blob_access.go",
         "empty_blob_injecting_blob_access.go",
+        "decomposing_blob_access.go",
         "error_blob_access.go",
         "existence_caching_blob_access.go",
         "icas_read_buffer_factory.go",
@@ -44,8 +45,12 @@ go_library(
 go_test(
     name = "blobstore_test",
     srcs = [
+<<<<<<< HEAD
         "demultiplexing_blob_access_test.go",
         "empty_blob_injecting_blob_access_test.go",
+=======
+        "decomposing_blob_access_test.go",
+>>>>>>> 8f929e8... Add preliminary support for decomposing large CAS objects
         "existence_caching_blob_access_test.go",
         "instance_name_access_checking_blob_access_test.go",
         "redis_blob_access_test.go",

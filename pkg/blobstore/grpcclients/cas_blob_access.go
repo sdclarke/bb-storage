@@ -74,7 +74,7 @@ func (ba *casBlobAccess) Get(ctx context.Context, digest digest.Digest) buffer.B
 }
 
 func (ba *casBlobAccess) Put(ctx context.Context, digest digest.Digest, b buffer.Buffer) error {
-	r := b.ToChunkReader(0, ba.readChunkSize)
+	r := b.ToChunkReader(0, buffer.ChunkSizeAtMost(ba.readChunkSize))
 	defer r.Close()
 
 	ctxWithCancel, cancel := context.WithCancel(ctx)

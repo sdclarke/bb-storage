@@ -119,7 +119,7 @@ func TestNewProtoBufferFromProtoToChunkReader(t *testing.T) {
 	t.Run("Success", func(t *testing.T) {
 		r := buffer.NewProtoBufferFromProto(&exampleActionResultMessage, buffer.UserProvided).ToChunkReader(
 			/* offset = */ 12,
-			/* chunk size = */ 10)
+			buffer.ChunkSizeAtMost(10))
 
 		off := 12
 		for ; off < len(exampleActionResultBytes)-10; off += 10 {
@@ -143,7 +143,7 @@ func TestNewProtoBufferFromProtoToChunkReader(t *testing.T) {
 		// return an end-of-file immediately.
 		r := buffer.NewProtoBufferFromProto(&exampleActionResultMessage, buffer.UserProvided).ToChunkReader(
 			/* offset = */ int64(len(exampleActionResultBytes)),
-			/* chunk size = */ 10)
+			buffer.ChunkSizeAtMost(10))
 		_, err := r.Read()
 		require.Equal(t, io.EOF, err)
 		r.Close()
@@ -152,7 +152,7 @@ func TestNewProtoBufferFromProtoToChunkReader(t *testing.T) {
 	t.Run("NegativeOffset", func(t *testing.T) {
 		r := buffer.NewProtoBufferFromProto(&exampleActionResultMessage, buffer.UserProvided).ToChunkReader(
 			/* offset = */ -123,
-			/* chunk size = */ 1024)
+			buffer.ChunkSizeAtMost(1024))
 
 		_, err := r.Read()
 		require.Equal(t, status.Error(codes.InvalidArgument, "Negative read offset: -123"), err)
@@ -163,7 +163,7 @@ func TestNewProtoBufferFromProtoToChunkReader(t *testing.T) {
 	t.Run("TooFar", func(t *testing.T) {
 		r := buffer.NewProtoBufferFromProto(&exampleActionResultMessage, buffer.UserProvided).ToChunkReader(
 			/* offset = */ int64(len(exampleActionResultBytes)+1),
-			/* chunk size = */ 100)
+			buffer.ChunkSizeAtMost(100))
 
 		_, err := r.Read()
 		require.Equal(t, status.Error(codes.InvalidArgument, "Buffer is 134 bytes in size, while a read at offset 135 was requested"), err)
