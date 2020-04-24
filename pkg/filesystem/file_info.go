@@ -15,6 +15,8 @@ const (
 	FileTypeDirectory
 	// FileTypeSymlink means the file is a symbolic link.
 	FileTypeSymlink
+	// FileTypeCharacterDevice means the file is a character device
+	FileTypeCharacterDevice
 	// FileTypeOther means the file is neither a regular file, a
 	// directory or symbolic link.
 	FileTypeOther

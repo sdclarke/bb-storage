@@ -137,6 +137,8 @@ func (d *localDirectory) lstat(name string) (FileType, deviceNumber, error) {
 		} else {
 			fileType = FileTypeRegularFile
 		}
+	case syscall.S_IFCHR:
+		fileType = FileTypeCharacterDevice
 	}
 	return fileType, stat.Dev, nil
 }
