@@ -3,6 +3,7 @@ package filesystem
 import (
 	"io"
 	"os"
+	"time"
 )
 
 // CreationMode specifies whether and how Directory.Open*() should
@@ -94,6 +95,8 @@ type Directory interface {
 	RemoveAllChildren() error
 	// Symlink is the equivalent of os.Symlink().
 	Symlink(oldName string, newName string) error
+	// Chtimes sets the atime and mtime of the named file.
+	Chtimes(name string, atime, mtime time.Time) error
 
 	// Function that base types may use to implement calls that
 	// require double dispatching, such as hardlinking and renaming.
