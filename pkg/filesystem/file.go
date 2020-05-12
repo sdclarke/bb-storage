@@ -2,13 +2,6 @@ package filesystem
 
 import (
 	"io"
-	"time"
-)
-
-var (
-	// DeterministicFileModificationTimestamp is a fixed timestamp set to
-	// 2000-01-01 00:00:00
-	DeterministicFileModificationTimestamp = time.Date(2000, time.January, 1, 0, 0, 0, 0, time.UTC)
 )
 
 // FileAppender is returned by Directory.OpenAppend(). It is a handle
