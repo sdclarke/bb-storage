@@ -368,14 +368,13 @@ func TestNewCASBufferFromReaderToChunkReader(t *testing.T) {
 
 	t.Run("SuccessChunkSizeExactly", func(t *testing.T) {
 		reader := ioutil.NopCloser(bytes.NewBufferString("Hello world"))
-		repairFunc := mock.NewMockRepairFunc(ctrl)
 
 		// For reader-backed buffers, the chunk size provided to
 		// ToChunkReader should be used as the read size.
 		r := buffer.NewCASBufferFromReader(
 			helloDigest,
 			reader,
-			buffer.Reparable(helloDigest, repairFunc.Call)).ToChunkReader(
+			buffer.UserProvided).ToChunkReader(
 			/* offset = */ 3,
 			buffer.ChunkSizeExactly(3))
 		chunk, err := r.Read()

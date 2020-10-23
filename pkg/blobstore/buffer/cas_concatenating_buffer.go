@@ -27,17 +27,15 @@ type SmallBufferFetcher func(offset int64) (Buffer, int64)
 type casConcatenatingBuffer struct {
 	digest  digest.Digest
 	fetcher SmallBufferFetcher
-	source  Source
 }
 
 // NewCASConcatenatingBuffer creates a Buffer for a CAS object whose
 // contents are backed by multiple Buffer objects that need to be
 // concatenated to form the full results.
-func NewCASConcatenatingBuffer(digest digest.Digest, fetcher SmallBufferFetcher, source Source) Buffer {
+func NewCASConcatenatingBuffer(digest digest.Digest, fetcher SmallBufferFetcher) Buffer {
 	return &casConcatenatingBuffer{
 		digest:  digest,
 		fetcher: fetcher,
-		source:  source,
 	}
 }
 
@@ -114,7 +112,7 @@ func (b *casConcatenatingBuffer) applyErrorHandler(errorHandler ErrorHandler) (r
 	// It isn't safe to eliminate the checksum validation at the top
 	// level, because that would allow mixing in corrupted data in
 	// case of error retrying.
-	return newCASErrorHandlingBuffer(b, errorHandler, b.digest, b.source), false
+	return newCASErrorHandlingBuffer(b, errorHandler, b.digest, UserProvided), false
 }
 
 func (b *casConcatenatingBuffer) toUnvalidatedChunkReader(off int64, chunkPolicy ChunkPolicy) ChunkReader {

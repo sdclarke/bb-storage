@@ -78,6 +78,7 @@ gomock(
         "ChunkReader",
         "DataIntegrityCallback",
         "ErrorHandler",
+        "ReadAtCloser",
         "SmallBufferFetcher",
     ],
     library = "//pkg/blobstore/buffer",

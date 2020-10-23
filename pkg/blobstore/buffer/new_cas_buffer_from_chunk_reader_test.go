@@ -428,14 +428,13 @@ func TestNewCASBufferFromChunkReaderToChunkReader(t *testing.T) {
 		chunkReader.EXPECT().Read().Return([]byte("world"), nil)
 		chunkReader.EXPECT().Read().Return(nil, io.EOF)
 		chunkReader.EXPECT().Close()
-		repairFunc := mock.NewMockRepairFunc(ctrl)
 
 		// The ChunkReader returned by ToChunkReader() should
 		// normalize all chunks to an exact size when requested.
 		r := buffer.NewCASBufferFromChunkReader(
 			helloDigest,
 			chunkReader,
-			buffer.Reparable(helloDigest, repairFunc.Call)).ToChunkReader(
+			buffer.UserProvided).ToChunkReader(
 			/* offset = */ 3,
 			buffer.ChunkSizeExactly(5))
 		chunk, err := r.Read()

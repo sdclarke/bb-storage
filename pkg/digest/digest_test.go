@@ -196,7 +196,7 @@ func TestDigestGetProto(t *testing.T) {
 		digest.MustNewDigest(
 			"hello",
 			"B3Z:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
-			123).GetPartialDigest())
+			123).GetProto())
 
 	// Other hashing functions (e.g. SHA-256), should get stored as
 	// a hexadecimal string.
@@ -219,10 +219,10 @@ func TestDigestGetInstanceName(t *testing.T) {
 		digest.MustNewDigest(
 			"hello",
 			"B3Z:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
-			123).GetInstance())
+			123).GetInstanceName())
 	require.Equal(
 		t,
-		"hello",
+		digest.MustNewInstanceName("hello"),
 		digest.MustNewDigest(
 			"hello",
 			"e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",

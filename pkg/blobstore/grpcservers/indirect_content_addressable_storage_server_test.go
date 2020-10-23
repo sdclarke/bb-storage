@@ -30,7 +30,7 @@ func TestIndirectContentAddressableStorageServerFindMissingReferences(t *testing
 			InstanceName: "example",
 			BlobDigests: []*remoteexecution.Digest{
 				{
-					Hash:      "This is not a valid hash",
+					HashOther: "This is not a valid hash",
 					SizeBytes: 123,
 				},
 			},
@@ -52,11 +52,11 @@ func TestIndirectContentAddressableStorageServerFindMissingReferences(t *testing
 			InstanceName: "example",
 			BlobDigests: []*remoteexecution.Digest{
 				{
-					Hash:      "8b1a9953c4611296a827abf8c47804d7",
+					HashOther: "8b1a9953c4611296a827abf8c47804d7",
 					SizeBytes: 5,
 				},
 				{
-					Hash:      "6fc422233a40a75a1f028e11c3cd1140",
+					HashOther: "6fc422233a40a75a1f028e11c3cd1140",
 					SizeBytes: 7,
 				},
 			},
@@ -77,11 +77,11 @@ func TestIndirectContentAddressableStorageServerFindMissingReferences(t *testing
 			InstanceName: "example",
 			BlobDigests: []*remoteexecution.Digest{
 				{
-					Hash:      "8b1a9953c4611296a827abf8c47804d7",
+					HashOther: "8b1a9953c4611296a827abf8c47804d7",
 					SizeBytes: 5,
 				},
 				{
-					Hash:      "6fc422233a40a75a1f028e11c3cd1140",
+					HashOther: "6fc422233a40a75a1f028e11c3cd1140",
 					SizeBytes: 7,
 				},
 			},
@@ -90,7 +90,7 @@ func TestIndirectContentAddressableStorageServerFindMissingReferences(t *testing
 		require.Equal(t, &remoteexecution.FindMissingBlobsResponse{
 			MissingBlobDigests: []*remoteexecution.Digest{
 				{
-					Hash:      "8b1a9953c4611296a827abf8c47804d7",
+					HashOther: "8b1a9953c4611296a827abf8c47804d7",
 					SizeBytes: 5,
 				},
 			},
@@ -137,7 +137,7 @@ func TestIndirectContentAddressableStorageServerBatchUpdateReferences(t *testing
 			Requests: []*icas.BatchUpdateReferencesRequest_Request{
 				{
 					Digest: &remoteexecution.Digest{
-						Hash:      "This is not a valid hash",
+						HashOther: "This is not a valid hash",
 						SizeBytes: 123,
 					},
 					Reference: &icas.Reference{
@@ -148,7 +148,7 @@ func TestIndirectContentAddressableStorageServerBatchUpdateReferences(t *testing
 				},
 				{
 					Digest: &remoteexecution.Digest{
-						Hash:      "8b1a9953c4611296a827abf8c47804d7",
+						HashOther: "8b1a9953c4611296a827abf8c47804d7",
 						SizeBytes: 5,
 					},
 					Reference: &icas.Reference{
@@ -159,7 +159,7 @@ func TestIndirectContentAddressableStorageServerBatchUpdateReferences(t *testing
 				},
 				{
 					Digest: &remoteexecution.Digest{
-						Hash:      "6fc422233a40a75a1f028e11c3cd1140",
+						HashOther: "6fc422233a40a75a1f028e11c3cd1140",
 						SizeBytes: 7,
 					},
 					Reference: &icas.Reference{
@@ -175,21 +175,21 @@ func TestIndirectContentAddressableStorageServerBatchUpdateReferences(t *testing
 			Responses: []*remoteexecution.BatchUpdateBlobsResponse_Response{
 				{
 					Digest: &remoteexecution.Digest{
-						Hash:      "This is not a valid hash",
+						HashOther: "This is not a valid hash",
 						SizeBytes: 123,
 					},
 					Status: status.New(codes.InvalidArgument, "Unknown digest hash length: 24 characters").Proto(),
 				},
 				{
 					Digest: &remoteexecution.Digest{
-						Hash:      "8b1a9953c4611296a827abf8c47804d7",
+						HashOther: "8b1a9953c4611296a827abf8c47804d7",
 						SizeBytes: 5,
 					},
 					Status: status.New(codes.Internal, "Disk I/O failure").Proto(),
 				},
 				{
 					Digest: &remoteexecution.Digest{
-						Hash:      "6fc422233a40a75a1f028e11c3cd1140",
+						HashOther: "6fc422233a40a75a1f028e11c3cd1140",
 						SizeBytes: 7,
 					},
 				},
@@ -209,7 +209,7 @@ func TestIndirectContentAddressableStorageServerGetReference(t *testing.T) {
 		_, err := s.GetReference(ctx, &icas.GetReferenceRequest{
 			InstanceName: "example",
 			Digest: &remoteexecution.Digest{
-				Hash:      "This is not a valid hash",
+				HashOther: "This is not a valid hash",
 				SizeBytes: 123,
 			},
 		})
@@ -226,7 +226,7 @@ func TestIndirectContentAddressableStorageServerGetReference(t *testing.T) {
 		_, err := s.GetReference(ctx, &icas.GetReferenceRequest{
 			InstanceName: "example",
 			Digest: &remoteexecution.Digest{
-				Hash:      "8b1a9953c4611296a827abf8c47804d7",
+				HashOther: "8b1a9953c4611296a827abf8c47804d7",
 				SizeBytes: 5,
 			},
 		})
@@ -250,7 +250,7 @@ func TestIndirectContentAddressableStorageServerGetReference(t *testing.T) {
 		resp, err := s.GetReference(ctx, &icas.GetReferenceRequest{
 			InstanceName: "example",
 			Digest: &remoteexecution.Digest{
-				Hash:      "8b1a9953c4611296a827abf8c47804d7",
+				HashOther: "8b1a9953c4611296a827abf8c47804d7",
 				SizeBytes: 5,
 			},
 		})

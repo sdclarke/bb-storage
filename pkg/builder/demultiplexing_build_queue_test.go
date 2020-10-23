@@ -96,7 +96,7 @@ func TestDemultiplexingBuildQueueExecute(t *testing.T) {
 		err := demultiplexingBuildQueue.Execute(&remoteexecution.ExecuteRequest{
 			InstanceName: "hello/blobs/world",
 			ActionDigest: &remoteexecution.Digest{
-				Hash:      "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+				HashOther: "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
 				SizeBytes: 0,
 			},
 		}, executeServer)
@@ -114,7 +114,7 @@ func TestDemultiplexingBuildQueueExecute(t *testing.T) {
 		err := demultiplexingBuildQueue.Execute(&remoteexecution.ExecuteRequest{
 			InstanceName: "Nonexistent backend",
 			ActionDigest: &remoteexecution.Digest{
-				Hash:      "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+				HashOther: "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
 				SizeBytes: 0,
 			},
 		}, executeServer)
@@ -131,7 +131,7 @@ func TestDemultiplexingBuildQueueExecute(t *testing.T) {
 		buildQueue.EXPECT().Execute(&remoteexecution.ExecuteRequest{
 			InstanceName: "rhel7",
 			ActionDigest: &remoteexecution.Digest{
-				Hash:      "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+				HashOther: "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
 				SizeBytes: 0,
 			},
 		}, gomock.Any()).Return(status.Error(codes.Unavailable, "Server not reachable"))
@@ -140,7 +140,7 @@ func TestDemultiplexingBuildQueueExecute(t *testing.T) {
 		err := demultiplexingBuildQueue.Execute(&remoteexecution.ExecuteRequest{
 			InstanceName: "ubuntu1804",
 			ActionDigest: &remoteexecution.Digest{
-				Hash:      "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+				HashOther: "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
 				SizeBytes: 0,
 			},
 		}, executeServer)
@@ -157,7 +157,7 @@ func TestDemultiplexingBuildQueueExecute(t *testing.T) {
 		buildQueue.EXPECT().Execute(&remoteexecution.ExecuteRequest{
 			InstanceName: "rhel7",
 			ActionDigest: &remoteexecution.Digest{
-				Hash:      "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+				HashOther: "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
 				SizeBytes: 0,
 			},
 		}, gomock.Any()).DoAndReturn(
@@ -182,7 +182,7 @@ func TestDemultiplexingBuildQueueExecute(t *testing.T) {
 		err := demultiplexingBuildQueue.Execute(&remoteexecution.ExecuteRequest{
 			InstanceName: "foo/ubuntu1804",
 			ActionDigest: &remoteexecution.Digest{
-				Hash:      "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+				HashOther: "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
 				SizeBytes: 0,
 			},
 		}, executeServer)

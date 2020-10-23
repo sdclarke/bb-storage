@@ -77,7 +77,7 @@ func TestDecomposingBlobAccessGet(t *testing.T) {
 			buffer.NewCASBufferFromChunkReader(
 				manifestDigest,
 				mockChunkReader,
-				buffer.Irreparable))
+				buffer.UserProvided))
 
 		r := blobAccess.Get(ctx, blobDigest).ToChunkReader(0, buffer.ChunkSizeAtMost(100))
 		_, err := r.Read()

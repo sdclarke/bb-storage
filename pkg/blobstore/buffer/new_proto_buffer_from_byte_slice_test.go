@@ -180,7 +180,7 @@ func TestNewProtoBufferFromByteSliceToChunkReader(t *testing.T) {
 		exampleActionResultBytes,
 		buffer.BackendProvided(dataIntegrityCallback.Call)).ToChunkReader(
 		/* offset = */ 0,
-		/* chunk size = */ 10000)
+		/* chunk size = */ buffer.ChunkSizeAtMost(10000))
 
 	data, err := r.Read()
 	require.NoError(t, err)
