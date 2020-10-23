@@ -85,7 +85,7 @@ func (b *casReaderBuffer) ToChunkReader(off int64, chunkPolicy ChunkPolicy) Chun
 }
 
 func (b *casReaderBuffer) ToReader() io.ReadCloser {
-	return newCASValidatingReader(b.r, b.digest, b.repairStrategy)
+	return newCASValidatingReader(b.r, b.digest, b.source)
 }
 
 func (b *casReaderBuffer) CloneCopy(maximumSizeBytes int) (Buffer, Buffer) {

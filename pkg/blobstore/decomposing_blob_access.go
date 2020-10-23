@@ -65,7 +65,7 @@ func (ba *decomposingBlobAccess) Get(ctx context.Context, digest digest.Digest) 
 			func(offset int64) (buffer.Buffer, int64) {
 				blockDigest, blockOffset := manifestParser.GetBlockDigest(manifest, offset)
 				return ba.base.Get(ctx, blockDigest), blockOffset
-			})
+			}, buffer.UserProvided)
 	}
 	return ba.base.Get(ctx, digest)
 }

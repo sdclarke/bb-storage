@@ -3,8 +3,8 @@ package buffer
 import (
 	"io"
 
-	remoteexecution "github.com/bazelbuild/remote-apis/build/bazel/remote/execution/v2"
 	"github.com/buildbarn/bb-storage/pkg/digest"
+	"github.com/golang/protobuf/proto"
 
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
@@ -27,15 +27,17 @@ type SmallBufferFetcher func(offset int64) (Buffer, int64)
 type casConcatenatingBuffer struct {
 	digest  digest.Digest
 	fetcher SmallBufferFetcher
+	source  Source
 }
 
 // NewCASConcatenatingBuffer creates a Buffer for a CAS object whose
 // contents are backed by multiple Buffer objects that need to be
 // concatenated to form the full results.
-func NewCASConcatenatingBuffer(digest digest.Digest, fetcher SmallBufferFetcher) Buffer {
+func NewCASConcatenatingBuffer(digest digest.Digest, fetcher SmallBufferFetcher, source Source) Buffer {
 	return &casConcatenatingBuffer{
 		digest:  digest,
 		fetcher: fetcher,
+		source:  source,
 	}
 }
 
@@ -72,8 +74,8 @@ func (b *casConcatenatingBuffer) ReadAt(p []byte, off int64) (int, error) {
 	}
 }
 
-func (b *casConcatenatingBuffer) ToActionResult(maximumSizeBytes int) (*remoteexecution.ActionResult, error) {
-	return toActionResultViaByteSlice(b, maximumSizeBytes)
+func (b *casConcatenatingBuffer) ToProto(m proto.Message, maximumSizeBytes int) (proto.Message, error) {
+	return toProtoViaByteSlice(b, m, maximumSizeBytes)
 }
 
 func (b *casConcatenatingBuffer) ToByteSlice(maximumSizeBytes int) ([]byte, error) {
@@ -112,7 +114,7 @@ func (b *casConcatenatingBuffer) applyErrorHandler(errorHandler ErrorHandler) (r
 	// It isn't safe to eliminate the checksum validation at the top
 	// level, because that would allow mixing in corrupted data in
 	// case of error retrying.
-	return newCASErrorHandlingBuffer(b, errorHandler, b.digest, Irreparable), false
+	return newCASErrorHandlingBuffer(b, errorHandler, b.digest, b.source), false
 }
 
 func (b *casConcatenatingBuffer) toUnvalidatedChunkReader(off int64, chunkPolicy ChunkPolicy) ChunkReader {

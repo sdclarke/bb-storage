@@ -6,6 +6,7 @@ import (
 	"crypto/sha256"
 	"crypto/sha512"
 	"encoding/hex"
+	"fmt"
 	"hash"
 	"path"
 	"strconv"

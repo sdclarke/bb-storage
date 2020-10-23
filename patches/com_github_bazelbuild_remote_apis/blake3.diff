@@ -34,9 +34,9 @@ index efbf513..bf08873 100644
  
  // ExecutedActionMetadata contains details about a completed execution.
 @@ -1485,6 +1500,28 @@ message DigestFunction {
- 
-     // The SHA-512 digest function.
-     SHA512 = 6;
+     // cryptographic hash function and its collision properties are not strongly guaranteed.
+     // See https://github.com/aappleby/smhasher/wiki/MurmurHash3 .
+     MURMUR3 = 7;
 +
 +    // A modified version of the BLAKE3 digest function, called
 +    // BLAKE3ZCC. This hashing algorithm is identical to BLAKE3 (see
@@ -58,7 +58,7 @@ index efbf513..bf08873 100644
 +    // hexadecimal strings, having prefix "B3Z:".
 +    //
 +    // Servers should support hashes between 16 and 128 bytes in size.
-+    BLAKE3ZCC = 7;
++    BLAKE3ZCC = 8; 
    }
  }
  

@@ -128,29 +128,6 @@ func TestNewCASConcatenatingBufferReadAt(t *testing.T) {
 	})
 }
 
-func TestNewCASConcatenatingBufferToActionResult(t *testing.T) {
-	ctrl := gomock.NewController(t)
-	defer ctrl.Finish()
-
-	// Only test the successful case, as other aspects are already
-	// covered by TestNewCASBufferFromChunkReaderToReader and other
-	// Buffer types.
-	t.Run("Exact", func(t *testing.T) {
-		fetcher := mock.NewMockSmallBufferFetcher(ctrl)
-		fetcher.EXPECT().Call(int64(0)).
-			Return(buffer.NewValidatedBufferFromByteSlice(exampleActionResultBytes[:10]), int64(0))
-		fetcher.EXPECT().Call(int64(10)).
-			Return(buffer.NewValidatedBufferFromByteSlice(exampleActionResultBytes[10:20]), int64(10))
-		fetcher.EXPECT().Call(int64(20)).
-			Return(buffer.NewValidatedBufferFromByteSlice(exampleActionResultBytes[20:]), int64(20))
-
-		actionResult, err := buffer.NewCASConcatenatingBuffer(exampleActionResultDigest, fetcher.Call).
-			ToActionResult(len(exampleActionResultBytes))
-		require.NoError(t, err)
-		require.True(t, proto.Equal(&exampleActionResultMessage, actionResult))
-	})
-}
-
 func TestNewCASConcatenatingBufferToByteSlice(t *testing.T) {
 	ctrl := gomock.NewController(t)
 	defer ctrl.Finish()

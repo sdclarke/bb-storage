@@ -160,7 +160,7 @@ func (in InstanceName) NewDigestFromProto(digest *remoteexecution.Digest) (Diges
 	if digest == nil {
 		return BadDigest, status.Error(codes.InvalidArgument, "No digest provided")
 	}
-	return in.NewDigest(digest.Hash, digest.SizeBytes)
+	return in.NewDigest(digest.HashOther, digest.SizeBytes)
 }
 
 // newDigestUnchecked constructs a Digest object from an instance name,

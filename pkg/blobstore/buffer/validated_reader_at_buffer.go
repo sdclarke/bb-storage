@@ -72,8 +72,8 @@ func (b *validatedReaderBuffer) ToByteSlice(maximumSizeBytes int) ([]byte, error
 	return ioutil.ReadAll(io.NewSectionReader(b.r, 0, b.sizeBytes))
 }
 
-func (b *validatedReaderBuffer) ToChunkReader(off int64, maximumChunkSizeBytes int) ChunkReader {
-	return b.toUnvalidatedChunkReader(off, maximumChunkSizeBytes)
+func (b *validatedReaderBuffer) ToChunkReader(off int64, chunkPolicy ChunkPolicy) ChunkReader {
+	return b.toUnvalidatedChunkReader(off, chunkPolicy)
 }
 
 func (b *validatedReaderBuffer) ToReader() io.ReadCloser {
@@ -114,12 +114,12 @@ func (b *validatedReaderBuffer) applyErrorHandler(errorHandler ErrorHandler) (re
 	return b, false
 }
 
-func (b *validatedReaderBuffer) toUnvalidatedChunkReader(off int64, maximumChunkSizeBytes int) ChunkReader {
+func (b *validatedReaderBuffer) toUnvalidatedChunkReader(off int64, chunkPolicy ChunkPolicy) ChunkReader {
 	if err := validateReaderOffset(b.sizeBytes, off); err != nil {
 		b.Discard()
 		return newErrorChunkReader(err)
 	}
-	return newReaderBackedChunkReader(b.toUnvalidatedReader(off), maximumChunkSizeBytes)
+	return newReaderBackedChunkReader(b.toUnvalidatedReader(off), chunkPolicy)
 }
 
 func (b *validatedReaderBuffer) toUnvalidatedReader(off int64) io.ReadCloser {
