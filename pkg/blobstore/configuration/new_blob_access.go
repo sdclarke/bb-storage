@@ -485,6 +485,15 @@ func newNestedBlobAccessBare(configuration *pb.BlobAccessConfiguration, creator 
 				}),
 			DigestKeyFormat: digest.KeyWithInstance,
 		}, "demultiplexing", nil
+	case *pb.BlobAccessConfiguration_Decomposing:
+		backendA, err := NewNestedBlobAccess(backend.Decomposing.Backend, creator)
+		if err != nil {
+			return BlobAccessInfo{}, "", err
+		}
+		return BlobAccessInfo{
+			BlobAccess:      blobstore.NewDecomposingBlobAccess(backendA.BlobAccess, int(backend.Decomposing.BlockSizeBytes), int(backend.Decomposing.MaximumManifestSizeBytes)),
+			DigestKeyFormat: digest.KeyWithInstance,
+		}, "decomposing", nil
 	}
 	return creator.NewCustomBlobAccess(configuration)
 }

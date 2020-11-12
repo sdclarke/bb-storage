@@ -499,192 +499,203 @@ func TestDecomposingBlobAccessFindMissing(t *testing.T) {
 		require.Equal(t, status.Error(codes.Internal, "Storage on fire"), err)
 	})
 
-	/*
-		t.Run("DecomposingSuccess", func(t *testing.T) {
-			// Calling FindMissing() on a composed object should
-			// trigger a FindMissing() call against its manifest
-			// counterpart. If that exists, it should be loaded from
-			// the CAS, followed by calling FindMissing() on all of
-			// the block stored inside.
-			mockBlobAccess.EXPECT().FindMissing(
-				ctx,
-				digest.NewSetBuilder().
-					Add(digest.MustNewDigest(
-						"hello",
-						"b9a44a420593fa18453b3be7b63922df43c93ff52d88f2cab26fe1fadba70031ff",
-						96)).
-					Build(),
-			).Return(digest.EmptySet, nil)
-			mockBlobAccess.EXPECT().Get(
-				ctx,
-				digest.MustNewDigest(
-					"hello",
-					"b9a44a420593fa18453b3be7b63922df43c93ff52d88f2cab26fe1fadba70031ff",
-					96)).Return(
-				buffer.NewValidatedBufferFromByteSlice(
-					[]byte{
-						// Hash of first block.
-						0xe8, 0xde, 0xef, 0x25, 0xed, 0x53, 0x35, 0x7d,
-						0x2a, 0x73, 0x8d, 0x71, 0x56, 0x06, 0x7e, 0x69,
-						0x89, 0x2a, 0x7b, 0xdc, 0x19, 0x08, 0x18, 0xcd,
-						0x2a, 0xd6, 0x98, 0xa3, 0xa1, 0xf9, 0x5e, 0x03,
-						// Hash of second block.
-						0xe8, 0xde, 0xef, 0x25, 0xed, 0x53, 0x35, 0x7d,
-						0x2a, 0x73, 0x8d, 0x71, 0x56, 0x06, 0x7e, 0x69,
-						0x89, 0x2a, 0x7b, 0xdc, 0x19, 0x08, 0x18, 0xcd,
-						0x2a, 0xd6, 0x98, 0xa3, 0xa1, 0xf9, 0x5e, 0x03,
-						// Hash of third block.
-						0x14, 0x06, 0xe0, 0x58, 0x81, 0xe2, 0x99, 0x36,
-						0x77, 0x66, 0xd3, 0x13, 0xe2, 0x6c, 0x05, 0x56,
-						0x4e, 0xc9, 0x1b, 0xf7, 0x21, 0xd3, 0x17, 0x26,
-						0xbd, 0x6e, 0x46, 0xe6, 0x06, 0x89, 0x53, 0x9a,
-					}))
-			mockBlobAccess.EXPECT().FindMissing(
-				ctx,
-				digest.NewSetBuilder().
-					Add(digest.MustNewDigest(
-						"hello",
-						"e8deef25ed53357d2a738d7156067e69892a7bdc190818cd2ad698a3a1f95e03fe",
-						2*1024*1024)).
-					Add(digest.MustNewDigest(
-						"hello",
-						"1406e05881e299367766d313e26c05564ec91bf721d31726bd6e46e60689539afe",
-						1)).
-					Build(),
-			).Return(digest.EmptySet, nil)
-
-			missing, err := blobAccess.FindMissing(
-				ctx,
-				digest.NewSetBuilder().
-					Add(digest.MustNewDigest(
-						"hello",
-						"b9a44a420593fa18453b3be7b63922df43c93ff52d88f2cab26fe1fadba7003100",
-						4*1024*1024+1)).
-					Build())
-			require.NoError(t, err)
-			require.Equal(t, digest.EmptySet, missing)
-		})
-
-		t.Run("DecomposingMissingManifest1", func(t *testing.T) {
-			// If the manifest of a composed object is absent, the
-			// composed object should be treated absent as well.
-			manifestDigests := digest.NewSetBuilder().
+	t.Run("DecomposingSuccess", func(t *testing.T) {
+		// Calling FindMissing() on a composed object should
+		// trigger a FindMissing() call against its manifest
+		// counterpart. If that exists, it should be loaded from
+		// the CAS, followed by calling FindMissing() on all of
+		// the block stored inside.
+		identity251 := make([]byte, 16*1024+1)
+		for i := 0; i < len(identity251); i++ {
+			identity251[i] = byte(i % 251)
+		}
+		blobDigest := digest.MustNewDigest(
+			"instance",
+			"B3Z:091108a2b65e2ae62b852eb3b25296badea4202048daf726e9411bfc12840d0b",
+			16*1024+1)
+		mockBlobAccess.EXPECT().FindMissing(
+			ctx,
+			digest.NewSetBuilder().
 				Add(digest.MustNewDigest(
-					"hello",
-					"b9a44a420593fa18453b3be7b63922df43c93ff52d88f2cab26fe1fadba70031ff",
-					96)).
-				Build()
-			mockBlobAccess.EXPECT().FindMissing(ctx, manifestDigests).Return(manifestDigests, nil)
-
-			blobDigests := digest.NewSetBuilder().
+					"instance",
+					"B3ZM:091108a2b65e2ae62b852eb3b25296badea4202048daf726e9411bfc12840d0b",
+					2*64+97)).
+				Build(),
+		).Return(digest.EmptySet, nil)
+		mockBlobAccess.EXPECT().Get(
+			ctx,
+			digest.MustNewDigest(
+				"instance",
+				"B3ZM:091108a2b65e2ae62b852eb3b25296badea4202048daf726e9411bfc12840d0b",
+				64+64+97),
+		).Return(buffer.NewValidatedBufferFromByteSlice([]byte{
+			// Message of first parent node.
+			0x65, 0xe4, 0xec, 0x2f, 0x94, 0x07, 0x3d, 0x6e, 0xb0, 0x0a, 0x9b, 0xf5, 0xc0, 0x85, 0xcd, 0xe9,
+			0x58, 0xec, 0x73, 0xed, 0x3b, 0xaa, 0xf2, 0xb8, 0x0d, 0x5e, 0x6f, 0x90, 0xdc, 0x86, 0x8e, 0x94,
+			0x28, 0x86, 0x21, 0xee, 0x0b, 0xe5, 0x5d, 0x79, 0x56, 0x72, 0x74, 0x5d, 0x01, 0x1e, 0x5b, 0xd7,
+			0x0f, 0x9b, 0x43, 0x56, 0x7a, 0x2a, 0xdf, 0x12, 0x38, 0x93, 0x05, 0x3e, 0x85, 0xdf, 0xa9, 0x59,
+			// Message of second parent node.
+			0x7f, 0x18, 0x44, 0x41, 0x50, 0xfb, 0x61, 0xb8, 0x7a, 0x2f, 0x4e, 0x8e, 0x40, 0x0f, 0x05, 0x00,
+			0xfb, 0x88, 0x9a, 0x12, 0xf8, 0x8d, 0xa8, 0xfe, 0xa3, 0xb5, 0xf8, 0x3e, 0xf6, 0x4f, 0x5b, 0x16,
+			0xc4, 0x45, 0x27, 0x45, 0x50, 0x32, 0xae, 0x0c, 0x21, 0xaf, 0xae, 0x52, 0xde, 0x96, 0x57, 0x71,
+			0xaf, 0x08, 0xf9, 0xa3, 0x1e, 0x92, 0x18, 0x4b, 0x3a, 0x7f, 0x93, 0x10, 0xd6, 0xb1, 0xed, 0x63,
+			// Chaining value, message and length of third chunk node.
+			0x67, 0xe6, 0x09, 0x6a, 0x85, 0xae, 0x67, 0xbb, 0x72, 0xf3, 0x6e, 0x3c, 0x3a, 0xf5, 0x4f, 0xa5,
+			0x7f, 0x52, 0x0e, 0x51, 0x8c, 0x68, 0x05, 0x9b, 0xab, 0xd9, 0x83, 0x1f, 0x19, 0xcd, 0xe0, 0x5b,
+			0x45, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
+			0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
+			0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
+			0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
+			0x81,
+		}))
+		mockBlobAccess.EXPECT().FindMissing(
+			ctx,
+			digest.NewSetBuilder().
 				Add(digest.MustNewDigest(
-					"hello",
-					"b9a44a420593fa18453b3be7b63922df43c93ff52d88f2cab26fe1fadba7003100",
-					4*1024*1024+1)).
-				Build()
-			missing, err := blobAccess.FindMissing(ctx, blobDigests)
-			require.NoError(t, err)
-			require.Equal(t, blobDigests, missing)
-		})
-
-		t.Run("DecomposingMissingManifest2", func(t *testing.T) {
-			// For exceptional circumstances, FindMissing() could
-			// report that the manifest is present, while Get() ends
-			// up failing with NOT_FOUND regardless. This should get
-			// translated to the composed object being absent.
-			manifestDigests := digest.NewSetBuilder().
+					"instance",
+					"B3Z:73c932bec255516b229488d6af3d29fc780e186bcae1b48bbbf8120ecd40cc43",
+					8*1024)).
 				Add(digest.MustNewDigest(
-					"hello",
-					"b9a44a420593fa18453b3be7b63922df43c93ff52d88f2cab26fe1fadba70031ff",
-					96)).
-				Build()
-			mockBlobAccess.EXPECT().FindMissing(ctx, manifestDigests).Return(digest.EmptySet, nil)
-			mockBlobAccess.EXPECT().Get(
-				ctx,
-				digest.MustNewDigest(
-					"hello",
-					"b9a44a420593fa18453b3be7b63922df43c93ff52d88f2cab26fe1fadba70031ff",
-					96,
-				)).Return(buffer.NewBufferFromError(status.Error(codes.NotFound, "Object not found")))
-
-			blobDigests := digest.NewSetBuilder().
+					"instance",
+					"B3Z:316e5d0ac41d22f079fa7a204a657cc1b85343fc6a478c8425d35b06c0b2ddf3",
+					8*1024)).
 				Add(digest.MustNewDigest(
-					"hello",
-					"b9a44a420593fa18453b3be7b63922df43c93ff52d88f2cab26fe1fadba7003100",
-					4*1024*1024+1)).
-				Build()
-			missing, err := blobAccess.FindMissing(ctx, blobDigests)
-			require.NoError(t, err)
-			require.Equal(t, blobDigests, missing)
-		})
+					"instance",
+					"B3Z:ea6f1d357d34988f735500e28867a6b7851b15871edb2bd59c01f139320cab81",
+					1)).Build(),
+		).Return(digest.EmptySet, nil)
 
-		t.Run("DecomposingMissingBlock", func(t *testing.T) {
-			// If the manifest of a composed object is present in the
-			// CAS and it can be loaded successfully, FindMissing()
-			// should be called against all of the blocks embedded
-			// in the composed object. If one of those is missing,
-			// the object should be considered absent.
-			manifestDigests := digest.NewSetBuilder().
-				Add(digest.MustNewDigest(
-					"hello",
-					"b9a44a420593fa18453b3be7b63922df43c93ff52d88f2cab26fe1fadba70031ff",
-					96)).
-				Build()
-			mockBlobAccess.EXPECT().FindMissing(ctx, manifestDigests).Return(digest.EmptySet, nil)
-			mockBlobAccess.EXPECT().Get(
-				ctx,
-				digest.MustNewDigest(
-					"hello",
-					"b9a44a420593fa18453b3be7b63922df43c93ff52d88f2cab26fe1fadba70031ff",
-					96)).Return(
-				buffer.NewValidatedBufferFromByteSlice(
-					[]byte{
-						// Hash of first block.
-						0xe8, 0xde, 0xef, 0x25, 0xed, 0x53, 0x35, 0x7d,
-						0x2a, 0x73, 0x8d, 0x71, 0x56, 0x06, 0x7e, 0x69,
-						0x89, 0x2a, 0x7b, 0xdc, 0x19, 0x08, 0x18, 0xcd,
-						0x2a, 0xd6, 0x98, 0xa3, 0xa1, 0xf9, 0x5e, 0x03,
-						// Hash of second block.
-						0xe8, 0xde, 0xef, 0x25, 0xed, 0x53, 0x35, 0x7d,
-						0x2a, 0x73, 0x8d, 0x71, 0x56, 0x06, 0x7e, 0x69,
-						0x89, 0x2a, 0x7b, 0xdc, 0x19, 0x08, 0x18, 0xcd,
-						0x2a, 0xd6, 0x98, 0xa3, 0xa1, 0xf9, 0x5e, 0x03,
-						// Hash of third block.
-						0x14, 0x06, 0xe0, 0x58, 0x81, 0xe2, 0x99, 0x36,
-						0x77, 0x66, 0xd3, 0x13, 0xe2, 0x6c, 0x05, 0x56,
-						0x4e, 0xc9, 0x1b, 0xf7, 0x21, 0xd3, 0x17, 0x26,
-						0xbd, 0x6e, 0x46, 0xe6, 0x06, 0x89, 0x53, 0x9a,
-					}))
-			mockBlobAccess.EXPECT().FindMissing(
-				ctx,
-				digest.NewSetBuilder().
-					Add(digest.MustNewDigest(
-						"hello",
-						"e8deef25ed53357d2a738d7156067e69892a7bdc190818cd2ad698a3a1f95e03fe",
-						2*1024*1024)).
-					Add(digest.MustNewDigest(
-						"hello",
-						"1406e05881e299367766d313e26c05564ec91bf721d31726bd6e46e60689539afe",
-						1)).
-					Build(),
-			).Return(
-				digest.NewSetBuilder().
-					Add(digest.MustNewDigest(
-						"hello",
-						"1406e05881e299367766d313e26c05564ec91bf721d31726bd6e46e60689539afe",
-						1)).
-					Build(),
-				nil)
+		missing, err := blobAccess.FindMissing(
+			ctx,
+			digest.NewSetBuilder().
+				Add(blobDigest).
+				Build())
+		require.NoError(t, err)
+		require.Equal(t, digest.EmptySet, missing)
+	})
 
-			blobDigests := digest.NewSetBuilder().
+	t.Run("DecomposingMissingManifest1", func(t *testing.T) {
+		// If the manifest of a composed object is absent, the
+		// composed object should be treated absent as well.
+		blobDigest := digest.MustNewDigest(
+			"instance",
+			"B3Z:091108a2b65e2ae62b852eb3b25296badea4202048daf726e9411bfc12840d0b",
+			16*1024+1)
+		manifestDigests := digest.NewSetBuilder().
+			Add(digest.MustNewDigest("instance",
+				"B3ZM:091108a2b65e2ae62b852eb3b25296badea4202048daf726e9411bfc12840d0b",
+				2*64+97)).Build()
+		mockBlobAccess.EXPECT().FindMissing(ctx, manifestDigests).Return(manifestDigests, nil)
+
+		blobDigests := digest.NewSetBuilder().
+			Add(blobDigest).
+			Build()
+		missing, err := blobAccess.FindMissing(ctx, blobDigests)
+		require.NoError(t, err)
+		require.Equal(t, blobDigests, missing)
+	})
+
+	t.Run("DecomposingMissingManifest2", func(t *testing.T) {
+		// For exceptional circumstances, FindMissing() could
+		// report that the manifest is present, while Get() ends
+		// up failing with NOT_FOUND regardless. This should get
+		// translated to the composed object being absent.
+		blobDigest := digest.MustNewDigest(
+			"instance",
+			"B3Z:091108a2b65e2ae62b852eb3b25296badea4202048daf726e9411bfc12840d0b",
+			16*1024+1)
+		manifestDigests := digest.NewSetBuilder().
+			Add(digest.MustNewDigest(
+				"instance",
+				"B3ZM:091108a2b65e2ae62b852eb3b25296badea4202048daf726e9411bfc12840d0b",
+				2*64+97)).
+			Build()
+		mockBlobAccess.EXPECT().FindMissing(ctx, manifestDigests).Return(digest.EmptySet, nil)
+		mockBlobAccess.EXPECT().Get(
+			ctx,
+			digest.MustNewDigest(
+				"instance",
+				"B3ZM:091108a2b65e2ae62b852eb3b25296badea4202048daf726e9411bfc12840d0b",
+				2*64+97,
+			)).Return(buffer.NewBufferFromError(status.Error(codes.NotFound, "Object not found")))
+
+		blobDigests := digest.NewSetBuilder().
+			Add(blobDigest).
+			Build()
+		missing, err := blobAccess.FindMissing(ctx, blobDigests)
+		require.NoError(t, err)
+		require.Equal(t, blobDigests, missing)
+	})
+
+	t.Run("DecomposingMissingBlock", func(t *testing.T) {
+		// If the manifest of a composed object is present in the
+		// CAS and it can be loaded successfully, FindMissing()
+		// should be called against all of the blocks embedded
+		// in the composed object. If one of those is missing,
+		// the object should be considered absent.
+		blobDigest := digest.MustNewDigest(
+			"instance",
+			"B3Z:091108a2b65e2ae62b852eb3b25296badea4202048daf726e9411bfc12840d0b",
+			16*1024+1)
+		manifestDigests := digest.NewSetBuilder().
+			Add(digest.MustNewDigest(
+				"instance",
+				"B3ZM:091108a2b65e2ae62b852eb3b25296badea4202048daf726e9411bfc12840d0b",
+				2*64+97)).
+			Build()
+		mockBlobAccess.EXPECT().FindMissing(ctx, manifestDigests).Return(digest.EmptySet, nil)
+		mockBlobAccess.EXPECT().Get(
+			ctx,
+			digest.MustNewDigest(
+				"instance",
+				"B3ZM:091108a2b65e2ae62b852eb3b25296badea4202048daf726e9411bfc12840d0b",
+				64+64+97),
+		).Return(buffer.NewValidatedBufferFromByteSlice([]byte{
+			// Message of first parent node.
+			0x65, 0xe4, 0xec, 0x2f, 0x94, 0x07, 0x3d, 0x6e, 0xb0, 0x0a, 0x9b, 0xf5, 0xc0, 0x85, 0xcd, 0xe9,
+			0x58, 0xec, 0x73, 0xed, 0x3b, 0xaa, 0xf2, 0xb8, 0x0d, 0x5e, 0x6f, 0x90, 0xdc, 0x86, 0x8e, 0x94,
+			0x28, 0x86, 0x21, 0xee, 0x0b, 0xe5, 0x5d, 0x79, 0x56, 0x72, 0x74, 0x5d, 0x01, 0x1e, 0x5b, 0xd7,
+			0x0f, 0x9b, 0x43, 0x56, 0x7a, 0x2a, 0xdf, 0x12, 0x38, 0x93, 0x05, 0x3e, 0x85, 0xdf, 0xa9, 0x59,
+			// Message of second parent node.
+			0x7f, 0x18, 0x44, 0x41, 0x50, 0xfb, 0x61, 0xb8, 0x7a, 0x2f, 0x4e, 0x8e, 0x40, 0x0f, 0x05, 0x00,
+			0xfb, 0x88, 0x9a, 0x12, 0xf8, 0x8d, 0xa8, 0xfe, 0xa3, 0xb5, 0xf8, 0x3e, 0xf6, 0x4f, 0x5b, 0x16,
+			0xc4, 0x45, 0x27, 0x45, 0x50, 0x32, 0xae, 0x0c, 0x21, 0xaf, 0xae, 0x52, 0xde, 0x96, 0x57, 0x71,
+			0xaf, 0x08, 0xf9, 0xa3, 0x1e, 0x92, 0x18, 0x4b, 0x3a, 0x7f, 0x93, 0x10, 0xd6, 0xb1, 0xed, 0x63,
+			// Chaining value, message and length of third chunk node.
+			0x67, 0xe6, 0x09, 0x6a, 0x85, 0xae, 0x67, 0xbb, 0x72, 0xf3, 0x6e, 0x3c, 0x3a, 0xf5, 0x4f, 0xa5,
+			0x7f, 0x52, 0x0e, 0x51, 0x8c, 0x68, 0x05, 0x9b, 0xab, 0xd9, 0x83, 0x1f, 0x19, 0xcd, 0xe0, 0x5b,
+			0x45, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
+			0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
+			0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
+			0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
+			0x81,
+		}))
+		mockBlobAccess.EXPECT().FindMissing(
+			ctx,
+			digest.NewSetBuilder().
 				Add(digest.MustNewDigest(
-					"hello",
-					"b9a44a420593fa18453b3be7b63922df43c93ff52d88f2cab26fe1fadba7003100",
-					4*1024*1024+1)).
-				Build()
-			missing, err := blobAccess.FindMissing(ctx, blobDigests)
-			require.NoError(t, err)
-			require.Equal(t, blobDigests, missing)
-		})
-	*/
+					"instance",
+					"B3Z:73c932bec255516b229488d6af3d29fc780e186bcae1b48bbbf8120ecd40cc43",
+					8*1024)).
+				Add(digest.MustNewDigest(
+					"instance",
+					"B3Z:316e5d0ac41d22f079fa7a204a657cc1b85343fc6a478c8425d35b06c0b2ddf3",
+					8*1024)).
+				Add(digest.MustNewDigest(
+					"instance",
+					"B3Z:ea6f1d357d34988f735500e28867a6b7851b15871edb2bd59c01f139320cab81",
+					1)).Build(),
+		).Return(digest.NewSetBuilder().Add(digest.MustNewDigest(
+			"instance",
+			"B3Z:ea6f1d357d34988f735500e28867a6b7851b15871edb2bd59c01f139320cab81",
+			1)).Build(),
+			nil)
+
+		blobDigests := digest.NewSetBuilder().
+			Add(blobDigest).
+			Build()
+		missing, err := blobAccess.FindMissing(ctx, blobDigests)
+		require.NoError(t, err)
+		require.Equal(t, blobDigests, missing)
+	})
 }

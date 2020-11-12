@@ -38,7 +38,9 @@ func (mp *blake3zccManifestParser) GetBlockDigest(manifest []byte, off int64) (D
 	block := off / mp.blockSizeBytes
 	blockSizeBytes := mp.blockSizeBytes
 	if block == convertSizeToBlockCount(mp.blobSizeBytes, mp.blockSizeBytes)-1 {
-		blockSizeBytes = mp.blobSizeBytes % mp.blockSizeBytes
+		if remainder := mp.blobSizeBytes % mp.blockSizeBytes; remainder != 0 {
+			blockSizeBytes = remainder
+		}
 	}
 
 	// Extract the Merkle tree node from the manifest.

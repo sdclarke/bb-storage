@@ -5,6 +5,7 @@ import (
 	"crypto/sha1"
 	"crypto/sha256"
 	"crypto/sha512"
+	"encoding/hex"
 	"fmt"
 	"hash"
 	"strings"
@@ -159,6 +160,11 @@ func (in InstanceName) newDigestOther(hash string, sizeBytes int64) (Digest, err
 func (in InstanceName) NewDigestFromProto(digest *remoteexecution.Digest) (Digest, error) {
 	if digest == nil {
 		return BadDigest, status.Error(codes.InvalidArgument, "No digest provided")
+	}
+	if len(digest.HashBlake3Zcc) != 0 {
+		return in.NewDigest(fmt.Sprintf("B3Z:%s", hex.EncodeToString(digest.HashBlake3Zcc)), digest.SizeBytes)
+	} else if len(digest.HashBlake3ZccManifest) != 0 {
+		return in.NewDigest(fmt.Sprintf("B3ZM:%s", hex.EncodeToString(digest.HashBlake3ZccManifest)), digest.SizeBytes)
 	}
 	return in.NewDigest(digest.HashOther, digest.SizeBytes)
 }
