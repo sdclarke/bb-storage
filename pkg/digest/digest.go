@@ -379,6 +379,29 @@ func (d Digest) NewHasher() hash.Hash {
 // a digest of an output file of a build action, given an action digest.
 func (d Digest) GetDigestFunction() Function {
 	hashEnd, _, sizeBytesEnd := d.unpack()
+	hashString := d.GetHashString()
+	if strings.HasPrefix(hashString, "B3Z:") {
+		return Function{
+			instanceName: InstanceName{
+				value: d.value[sizeBytesEnd+1:],
+			},
+			hasherFactory: func() hash.Hash {
+				return newBLAKE3ZCCBlobHasher(len(hashString[4:]) / 2)
+			},
+			hashLength: len(hashString[4:]),
+		}
+	}
+	if strings.HasPrefix(hashString, "B3ZM:") {
+		return Function{
+			instanceName: InstanceName{
+				value: d.value[sizeBytesEnd+1:],
+			},
+			hasherFactory: func() hash.Hash {
+				return newBLAKE3ZCCManifestHasher(len(hashString[5:]) / 2)
+			},
+			hashLength: len(hashString[5:]),
+		}
+	}
 	return Function{
 		instanceName: InstanceName{
 			value: d.value[sizeBytesEnd+1:],
