@@ -2,6 +2,7 @@ package digest
 
 import (
 	"encoding/hex"
+	"fmt"
 	"hash"
 
 	remoteexecution "github.com/bazelbuild/remote-apis/build/bazel/remote/execution/v2"
@@ -13,6 +14,7 @@ type Function struct {
 	instanceName  InstanceName
 	hasherFactory func() hash.Hash
 	hashLength    int
+	prefix        string
 }
 
 // MustNewFunction constructs a Function similar to
@@ -43,6 +45,7 @@ func (f Function) NewGenerator() *Generator {
 	return &Generator{
 		instanceName: f.instanceName,
 		partialHash:  f.hasherFactory(),
+		prefix:       f.prefix,
 	}
 }
 
@@ -52,6 +55,7 @@ type Generator struct {
 	instanceName InstanceName
 	partialHash  hash.Hash
 	sizeBytes    int64
+	prefix       string
 }
 
 // Write a chunk of data from a newly created file into the state of the
@@ -65,7 +69,7 @@ func (dg *Generator) Write(p []byte) (int, error) {
 // Sum creates a new digest based on the data written into the
 // Generator.
 func (dg *Generator) Sum() Digest {
-	return dg.instanceName.newDigestUnchecked(
-		hex.EncodeToString(dg.partialHash.Sum(nil)),
+	return dg.instanceName.newDigestUnchecked(fmt.Sprintf("%s%s", dg.prefix,
+		hex.EncodeToString(dg.partialHash.Sum(nil))),
 		dg.sizeBytes)
 }

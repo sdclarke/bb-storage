@@ -389,6 +389,7 @@ func (d Digest) GetDigestFunction() Function {
 				return newBLAKE3ZCCBlobHasher(len(hashString[4:]) / 2)
 			},
 			hashLength: len(hashString[4:]),
+			prefix:     hashString[:4],
 		}
 	}
 	if strings.HasPrefix(hashString, "B3ZM:") {
@@ -400,6 +401,7 @@ func (d Digest) GetDigestFunction() Function {
 				return newBLAKE3ZCCManifestHasher(len(hashString[5:]) / 2)
 			},
 			hashLength: len(hashString[5:]),
+			prefix:     hashString[:5],
 		}
 	}
 	return Function{
